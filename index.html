@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kita, yang Retak</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300;1,9..144,400&family=Figtree:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --fog:#dde1e4; --paper:#eceeef; --prussian:#1d2a3b; --plum:#6d3b5e; --seam:#b98f4a; --mute:#4b5868;
+  --bg:var(--fog); --ink:var(--prussian); --card:var(--paper);
+  --serif:"Fraunces",Georgia,"Times New Roman",serif;
+  --sans:"Figtree","Helvetica Neue",Arial,sans-serif;
+  --g1:#cdd5dd; --g2:#d8d2dc; --g3:#c4ced9; --g4:#dccdd5; --vig:rgba(60,50,80,.2); --vop:.3;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--bg:#161e2b;--ink:#dde1e4;--card:#1f2a3a;--mute:#93a0ae;--plum:#c08aae;--seam:#d2a95f;--g1:#0f1724;--g2:#1c1a2f;--g3:#27203a;--g4:#122030;--vig:rgba(0,0,0,.55);--vop:.5}
+}
+:root[data-theme="dark"]{--bg:#161e2b;--ink:#dde1e4;--card:#1f2a3a;--mute:#93a0ae;--plum:#c08aae;--seam:#d2a95f;--g1:#0f1724;--g2:#1c1a2f;--g3:#27203a;--g4:#122030;--vig:rgba(0,0,0,.55);--vop:.5}
+*{box-sizing:border-box;margin:0}
+html{scroll-padding-top:env(safe-area-inset-top,0px);background:var(--bg)}
+body{color:var(--ink);font-family:var(--sans);font-weight:300;line-height:1.75;overflow-x:hidden}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--seam);outline-offset:4px}
+
+/* ---------- Latar: gradasi senja + hujan di kaca ---------- */
+.scene{position:fixed;inset:0;z-index:-1;overflow:hidden;
+  background:linear-gradient(125deg,var(--g1),var(--g2),var(--g3),var(--g4));background-size:300% 300%;
+  animation:drift 28s ease-in-out infinite alternate}
+.scene::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,transparent 35%,var(--vig) 100%)}
+.scene canvas{position:absolute;inset:0;width:100%;height:100%}
+.bgvideo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:65% center;opacity:0;transition:opacity 2.5s ease;filter:saturate(.75) contrast(1.05)}
+.bgvideo.on{opacity:var(--vop)} /* ubah --vop di :root (mode terang) dan di mode gelap untuk mengatur kejelasan video */
+
+/* Siluet dua orang berpelukan: muncul pelan, lalu menjauh dan lenyap, berulang tiap 22 detik */
+.hug{position:absolute;left:50%;bottom:0;transform:translateX(-50%);height:62vh;max-height:560px;aspect-ratio:200/270;
+  color:var(--plum);opacity:0;filter:blur(1.2px);animation:hug 22s ease-in-out 3s infinite}
+.hug .pl{animation:partL 22s ease-in-out 3s infinite}
+.hug .pr{animation:partR 22s ease-in-out 3s infinite}
+.hug .halo{animation:halo 22s ease-in-out 3s infinite;opacity:0}
+@keyframes hug{0%{opacity:0}16%{opacity:.5}52%{opacity:.5}74%{opacity:0}100%{opacity:0}}
+@keyframes partL{0%,52%{transform:translate(0,0)}74%,100%{transform:translate(-18px,-10px)}}
+@keyframes partR{0%,52%{transform:translate(0,0)}74%,100%{transform:translate(18px,-10px)}}
+@keyframes halo{0%{opacity:0}16%{opacity:1}52%{opacity:1}66%,100%{opacity:0}}
+@keyframes drift{0%{background-position:0% 30%}100%{background-position:100% 70%}}
+
+/* ---------- Hero: satu kata yang robek ---------- */
+.hero{min-height:100svh;display:grid;place-items:center;position:relative;overflow:hidden;text-align:center;padding:2rem 1rem}
+.seam{position:absolute;top:0;bottom:0;left:50%;width:3px;transform:translateX(-50%);
+  background:linear-gradient(transparent,var(--seam) 30%,var(--seam) 70%,transparent);
+  filter:blur(1px);opacity:0;animation:glow 2.6s ease-out .5s forwards}
+.torn{position:relative;width:100%;max-width:1100px}
+.half{font-family:var(--serif);font-weight:300;font-size:clamp(7rem,32vw,24rem);line-height:1;letter-spacing:-.03em;
+  display:block;padding:.05em 0}
+.half.r{position:absolute;inset:0}
+.half.l{clip-path:polygon(0 0,51% 0,47% 16%,54% 31%,46% 49%,53% 67%,48% 84%,50% 100%,0 100%);
+  animation:left 2.6s cubic-bezier(.2,.8,.2,1) .5s forwards}
+.half.r{clip-path:polygon(51% 0,100% 0,100% 100%,50% 100%,48% 84%,53% 67%,46% 49%,54% 31%,47% 16%);
+  color:var(--plum);font-style:italic;
+  animation:right 2.6s cubic-bezier(.2,.8,.2,1) .5s forwards}
+.sub{position:absolute;left:0;right:0;bottom:2.2rem;font-family:var(--serif);font-style:italic;color:var(--mute);
+  font-size:1.05rem;opacity:0;animation:fade 2s ease 2.4s forwards}
+@keyframes left{to{transform:translate(-2.2vw,.4vw) rotate(-1.4deg)}}
+@keyframes right{to{transform:translate(2.2vw,-.4vw) rotate(1.4deg)}}
+@keyframes glow{to{opacity:.9}}
+@keyframes fade{to{opacity:1}}
+
+/* ---------- Isi ---------- */
+main{max-width:46rem;margin:0 auto;padding:0 1.5rem}
+.lead{font-family:var(--serif);font-weight:300;font-size:clamp(1.5rem,4.4vw,2.2rem);line-height:1.4;padding:6rem 0 5rem}
+.lead s{text-decoration-color:var(--plum);text-decoration-thickness:1px;color:var(--mute)}
+
+/* Linimasa: ini memang urutan waktu, jadi memakai nomor */
+.timeline{list-style:none;padding:0 0 6rem;border-left:1px solid var(--seam);margin-left:.5rem}
+.timeline li{position:relative;padding:0 0 3.2rem 2.2rem}
+.timeline li::before{content:"";position:absolute;left:-5px;top:.7rem;width:9px;height:9px;border-radius:50%;background:var(--bg);border:1px solid var(--seam)}
+.timeline li:nth-child(n+3)::before{background:var(--seam)}
+.timeline li:nth-child(4){opacity:.78}
+.timeline small{font-family:var(--serif);font-style:italic;color:var(--plum);font-size:1rem}
+.timeline h2{font-family:var(--serif);font-weight:600;font-size:1.6rem;line-height:1.3;margin:.1rem 0 .4rem}
+.timeline p{color:var(--mute);max-width:34rem}
+
+/* ---------- Surat yang tidak pernah terkirim ---------- */
+.letter{background:var(--card);padding:clamp(2rem,6vw,4rem);margin:0 0 7rem;position:relative;
+  transform:rotate(-.6deg);box-shadow:0 30px 50px -30px rgba(20,30,45,.45);
+  clip-path:polygon(0 0,100% 0,100% 94%,96% 96%,92% 94%,88% 97%,84% 94%,80% 96.5%,76% 94%,72% 97%,68% 94.5%,64% 96%,60% 94%,56% 97%,52% 94%,48% 96%,44% 94.5%,40% 97%,36% 94%,32% 96%,28% 94%,24% 97%,20% 94.5%,16% 96%,12% 94%,8% 97%,4% 94.5%,0 96%)}
+.letter h3{font-family:var(--serif);font-style:italic;font-weight:400;font-size:1.3rem;margin-bottom:1.6rem;color:var(--plum)}
+.letter p{font-family:var(--serif);font-size:1.12rem;line-height:1.95;margin-bottom:1.2rem;max-width:36rem}
+.letter del{color:var(--mute);text-decoration-color:var(--plum)}
+.letter .sign{margin-top:2rem;text-align:right;font-style:italic;color:var(--mute);margin-bottom:2rem}
+
+/* ---------- Adegan perpisahan: berpelukan, pergi, melambai ---------- */
+.farewell{margin:0 0 6rem;text-align:center;color:var(--ink)}
+.farewell svg{width:100%;height:auto;display:block;overflow:visible}
+.farewell .sil{fill:currentColor;opacity:.92}
+.farewell .ln{fill:none;stroke:currentColor;stroke-linecap:round;stroke-width:6;opacity:.92}
+.farewell .fig.a{transform:translateX(276px)}
+.farewell .fig.b{transform:translateX(324px)}
+.farewell .rest,.farewell .restw,.farewell .wv{opacity:0}
+.farewell .l1{--a:20deg}
+.farewell .l2{--a:-20deg}
+.farewell .caps{display:grid;margin:1.2rem auto 1.6rem;max-width:30rem;min-height:3.6em}
+.farewell .caps p{grid-area:1/1;font-family:var(--serif);font-style:italic;font-size:1.15rem;line-height:1.6;color:var(--mute);opacity:0}
+.farewell .caps .c1{opacity:1}
+button.again{background:transparent;color:var(--ink);cursor:pointer}
+
+.farewell.play .fig.a{animation:walkA 20s ease-in-out forwards}
+.farewell.play .fig.b{animation:walkB 20s ease-in-out forwards}
+.farewell.play .hug{animation:hugOut 20s linear forwards}
+.farewell.play .rest{animation:restIn 20s linear forwards}
+.farewell.play .restw{animation:restwMid 20s linear forwards}
+.farewell.play .wv{animation:waveIn 20s linear forwards}
+.farewell.play .wr{animation:wag .7s ease-in-out 12.6s infinite alternate}
+.farewell.play .leg{animation:swing .857s ease-in-out 6s 7}
+.farewell.play .c1{animation:c1 20s linear forwards}
+.farewell.play .c2{animation:c2 20s linear forwards}
+.farewell.play .c3{animation:c3 20s linear forwards}
+.farewell .lamp{animation:flicker 7s ease-in-out infinite}
+
+@keyframes walkA{0%,30%{transform:translateX(276px)}60%,100%{transform:translateX(80px)}}
+@keyframes walkB{0%,30%{transform:translateX(324px)}60%,100%{transform:translateX(520px)}}
+@keyframes hugOut{0%,24%{opacity:1}27%,100%{opacity:0}}
+@keyframes restIn{0%,24%{opacity:0}27%,100%{opacity:1}}
+@keyframes restwMid{0%,24%{opacity:0}27%,60%{opacity:1}63%,100%{opacity:0}}
+@keyframes waveIn{0%,60%{opacity:0}64%,100%{opacity:1}}
+@keyframes swing{0%{transform:rotate(0)}25%{transform:rotate(var(--a))}75%{transform:rotate(calc(var(--a) * -1))}100%{transform:rotate(0)}}
+@keyframes wag{from{transform:rotate(-16deg)}to{transform:rotate(20deg)}}
+@keyframes c1{0%,22%{opacity:1}28%,100%{opacity:0}}
+@keyframes c2{0%,26%{opacity:0}32%,56%{opacity:1}62%,100%{opacity:0}}
+@keyframes c3{0%,62%{opacity:0}70%,100%{opacity:1}}
+@keyframes flicker{0%,100%{opacity:1}46%{opacity:.92}50%{opacity:.7}54%{opacity:.95}}
+
+/* ---------- Penutup ---------- */
+footer{text-align:center;padding:2rem 1.5rem 7rem}
+footer p{font-family:var(--serif);font-weight:300;font-size:clamp(1.8rem,6vw,3.2rem);line-height:1.25;max-width:30rem;margin:0 auto 2.4rem}
+footer em{color:var(--plum)}
+.again{display:inline-block;font-family:var(--sans);font-size:.95rem;padding:.8rem 1.8rem;border:1px solid var(--ink);border-radius:999px;text-decoration:none;
+  transition:background .3s,color .3s}
+.again:hover{background:var(--ink);color:var(--bg)}
+
+/* ---------- Tombol suara ---------- */
+.sound{position:fixed;right:1rem;bottom:calc(1rem + env(safe-area-inset-bottom,0px));z-index:5;display:flex;align-items:center;gap:.7rem;
+  font:inherit;font-size:.9rem;color:var(--ink);background:var(--card);border:1px solid var(--seam);border-radius:999px;padding:.6rem 1.2rem .6rem 1rem;cursor:pointer;
+  box-shadow:0 10px 24px -12px rgba(20,30,45,.5)}
+.sound .bars{display:flex;align-items:center;gap:3px;height:16px}
+.sound .bars i{display:block;width:2px;height:4px;background:var(--plum);border-radius:2px}
+.sound[aria-pressed="true"] .bars i{animation:wave 1.6s ease-in-out infinite}
+.sound[aria-pressed="true"] .bars i:nth-child(2){animation-delay:.3s}
+.sound[aria-pressed="true"] .bars i:nth-child(3){animation-delay:.6s}
+.sound[aria-pressed="true"] .bars i:nth-child(4){animation-delay:.9s}
+@keyframes wave{50%{height:16px}}
+
+@media (prefers-reduced-motion:reduce){
+  .half.l{animation:none;transform:translate(-2.2vw,.4vw) rotate(-1.4deg)}
+  .half.r{animation:none;transform:translate(2.2vw,-.4vw) rotate(1.4deg)}
+  .seam,.sub{animation:none;opacity:1}
+  .scene{animation:none}
+  .farewell *{animation:none!important}
+  .farewell .fig.a{transform:translateX(80px)}
+  .farewell .fig.b{transform:translateX(520px)}
+  .farewell .hug,.farewell .restw{opacity:0}
+  .farewell .rest,.farewell .wv{opacity:1}
+  .farewell .caps .c1,.farewell .caps .c2{opacity:0}
+  .farewell .caps .c3{opacity:1}
+  .hug,.hug .pl,.hug .pr,.hug .halo{animation:none}
+  .hug{opacity:.2}
+  .sound .bars i{animation:none!important;height:8px}
+}
+</style>
+</head>
+<body id="top">
+
+<div class="scene" aria-hidden="true">
+  <svg class="hug" viewBox="0 0 200 270" focusable="false">
+    <defs>
+      <linearGradient id="fadeY" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#fff"/><stop offset=".6" stop-color="#fff"/><stop offset="1" stop-color="#000"/>
+      </linearGradient>
+      <mask id="mist"><rect width="200" height="270" fill="url(#fadeY)"/></mask>
+      <radialGradient id="halo">
+        <stop offset="0" style="stop-color:var(--seam)" stop-opacity=".55"/>
+        <stop offset="1" style="stop-color:var(--seam)" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <ellipse class="halo" cx="106" cy="120" rx="110" ry="130" fill="url(#halo)"/>
+    <g mask="url(#mist)" fill="currentColor" stroke="currentColor">
+      <g class="pl" stroke="none">
+        <circle cx="94" cy="52" r="17"/>
+        <rect x="88" y="64" width="12" height="14"/>
+        <path d="M60 96Q60 78 82 76L106 76Q122 78 122 96L126 160 120 270 52 270 56 160Z"/>
+        <path d="M108 104Q142 108 146 150" fill="none" stroke="currentColor" stroke-width="13" stroke-linecap="round"/>
+      </g>
+      <g class="pr" stroke="none">
+        <circle cx="120" cy="60" r="16"/>
+        <rect x="114" y="72" width="12" height="14"/>
+        <path d="M94 104Q96 88 118 86L142 86Q160 88 160 106L164 165 158 270 90 270 86 165Z"/>
+        <path d="M136 116Q96 120 88 160" fill="none" stroke="currentColor" stroke-width="12" stroke-linecap="round"/>
+      </g>
+    </g>
+  </svg>
+  <!-- Taruh file video di folder yang sama dan beri nama latar.mp4. Jika tidak ada, latar lama tetap tampil. -->
+  <video id="bgv" class="bgvideo" src="latar.mp4" autoplay muted loop playsinline preload="auto"></video>
+  <canvas id="rain"></canvas>
+</div>
+
+<header class="hero">
+  <div class="seam" aria-hidden="true"></div>
+  <h1 class="torn" aria-label="Kita">
+    <span class="half l" aria-hidden="true">Kita</span>
+    <span class="half r" aria-hidden="true">Kita</span>
+  </h1>
+  <p class="sub">yang dulu satu kata, kini dua kalimat.</p>
+</header>
+
+<main>
+  <p class="lead">Tidak ada yang berteriak. Tidak ada piring pecah. Kita hanya berhenti saling menoleh, <s>dan menyebutnya dewasa</s> lalu menyebutnya takdir.</p>
+
+  <ol class="timeline">
+    <li><small>Mula</small><h2>Dua cangkir di satu meja</h2><p>Kopimu selalu dingin sebelum habis, karena kamu terlalu sibuk bercerita. Aku tidak pernah keberatan.</p></li>
+    <li><small>Retak</small><h2>Kalimat yang dipotong separuh</h2><p>“Nanti saja,” katamu. Nanti menjadi kata yang paling sering kita pakai, dan paling jarang kita tepati.</p></li>
+    <li><small>Hening</small><h2>Ruang yang terlalu rapi</h2><p>Tidak ada lagi barang tertinggal. Kita saling mengembalikan semuanya, termasuk hal-hal yang sebenarnya bukan pinjaman.</p></li>
+    <li><small>Pergi</small><h2>Pintu ditutup pelan-pelan</h2><p>Karena kita sama-sama tahu, bunyi pintu yang keras akan membuat salah satu dari kita menoleh.</p></li>
+  </ol>
+
+  <section class="farewell" aria-label="Dua bayangan berpelukan, lalu berjalan ke arah berlawanan dan saling melambai">
+    <svg viewBox="0 0 600 290" role="img" aria-hidden="true">
+      <defs>
+        <radialGradient id="glow"><stop offset="0" style="stop-color:var(--seam);stop-opacity:.45"/><stop offset="1" style="stop-color:var(--seam);stop-opacity:0"/></radialGradient>
+        <linearGradient id="cone" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--seam);stop-opacity:.3"/><stop offset="1" style="stop-color:var(--seam);stop-opacity:.02"/></linearGradient>
+      </defs>
+      <g class="lamp">
+        <circle cx="300" cy="110" r="150" fill="url(#glow)"/>
+        <polygon points="294,82 306,82 380,250 220,250" fill="url(#cone)"/>
+      </g>
+      <path d="M300 250V76" stroke="currentColor" stroke-width="4" opacity=".6"/>
+      <path d="M284 76Q300 56 316 76Z" fill="currentColor" opacity=".7"/>
+      <circle cx="300" cy="80" r="5" style="fill:var(--seam)"/>
+      <line x1="0" y1="250" x2="600" y2="250" style="stroke:var(--seam)" stroke-width="1" opacity=".6"/>
+      <g transform="translate(0 250)">
+      <g class="fig a"><g transform="scale(1.5)">
+        <g transform="translate(-6 -20)"><g class="leg l1"><line class="ln" style="stroke-width:7" x1="0" y1="0" x2="0" y2="20"/></g></g>
+        <g transform="translate(6 -20)"><g class="leg l2"><line class="ln" style="stroke-width:7" x1="0" y1="0" x2="0" y2="20"/></g></g>
+        <path class="sil" d="M-15 -68Q0 -73 15 -68L19 -20H-19Z"/>
+        <circle class="sil" cx="3" cy="-82" r="11"/>
+        <path class="ln hug" d="M15 -62Q46 -66 44 -42"/>
+        <path class="ln hug" d="M-12 -58Q10 -42 40 -44"/>
+        <path class="ln rest" d="M-15 -64L-19 -30"/>
+        <path class="ln restw" d="M15 -64L19 -30"/>
+        <g transform="translate(15 -64)"><g class="wv"><g class="wr"><line class="ln" x1="0" y1="0" x2="22" y2="-28"/></g></g></g>
+      </g></g>
+      <g class="fig b"><g transform="scale(-1.5 1.5)">
+        <g transform="translate(-6 -20)"><g class="leg l1"><line class="ln" style="stroke-width:7" x1="0" y1="0" x2="0" y2="20"/></g></g>
+        <g transform="translate(6 -20)"><g class="leg l2"><line class="ln" style="stroke-width:7" x1="0" y1="0" x2="0" y2="20"/></g></g>
+        <path class="sil" d="M-19 -40L19 -40L27 -12L-27 -12Z"/>
+        <path class="sil" d="M-15 -68Q0 -73 15 -68L19 -20H-19Z"/>
+        <path class="sil" d="M-13 -84Q-17 -62 -12 -54L12 -54Q17 -62 13 -84Z"/>
+        <circle class="sil" cx="3" cy="-82" r="11"/>
+        <path class="ln hug" d="M15 -62Q46 -66 44 -42"/>
+        <path class="ln hug" d="M-12 -58Q10 -42 40 -44"/>
+        <path class="ln rest" d="M-15 -64L-19 -30"/>
+        <path class="ln restw" d="M15 -64L19 -30"/>
+        <g transform="translate(15 -64)"><g class="wv"><g class="wr"><line class="ln" x1="0" y1="0" x2="22" y2="-28"/></g></g></g>
+      </g></g>
+      </g>
+    </svg>
+    <div class="caps">
+      <p class="c1">Satu pelukan terakhir. Cukup lama untuk pura-pura belum selesai.</p>
+      <p class="c2">Lalu kita melangkah ke arah yang berlawanan.</p>
+      <p class="c3">Dan saling melambai, dari jarak yang tak lagi bisa dijangkau.</p>
+    </div>
+    <button class="again replay" type="button">Putar ulang</button>
+  </section>
+
+  <article class="letter">
+    <h3>Dariku yang pernah singgah dihatimu</h3>
+    <p>Hai, Mas. Ternyata kita sudah sejauh ini ya. Dulu kukira jarak terjauh di antara kita hanyalah ujung meja dan dua cangkir yang sama-sama mendingin.</p>
+    <p>Aku capek, Mas. Bukan capek karena kamu pergi, tapi capek menunggu seseorang yang sebenarnya sudah lama pulang ke tempat lain. Capek menerjemahkan diammu. Capek berpura-pura semuanya masih baik-baik saja.</p>
+    <p>Aku ingin bilang bahwa aku sudah ikhlas. <del>Padahal tiap malam namamu masih kubaca pelan-pelan.</del> Aku tidak marah. Marah butuh tenaga, dan tenagaku habis kupakai untuk mempertahankan kita sendirian.</p>
+    <p>Terima kasih untuk beberapa bulan yang hangat. Maaf kalau di ujungnya aku berubah sedingin ini. Aku hanya ingin berhenti menunggu, walau hatiku belum tahu caranya.</p>
+    <p class="sign">dari seseorang yang dulu selalu pulang kepadamu</p>
+  </article>
+</main>
+
+<footer>
+  <p>Beberapa cerita tidak berakhir buruk. Ia hanya <em>selesai</em>.</p>
+  <a class="again" href="#top">Baca dari awal</a>
+</footer>
+
+<!-- Ganti nama file mp3 kamu menjadi teramini.mp3 (tanpa spasi), lalu taruh satu folder dengan file ini -->
+<audio id="bgm" src="teramini.mp3" preload="auto" loop></audio>
+
+<button class="sound" id="sound" type="button" aria-pressed="false">
+  <span class="bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+  <span id="soundLabel">Dengarkan</span>
+</button>
+
+<script>
+/* Video latar: tampil hanya jika latar.mp4 ada dan bisa diputar */
+(function(){
+  var v=document.getElementById('bgv');
+  if(!v)return;
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){v.remove();return;}
+  v.addEventListener('canplay',function(){
+    v.classList.add('on');
+    var p=v.play();if(p&&p.catch)p.catch(function(){});
+  });
+  v.addEventListener('error',function(){v.remove();});
+})();
+</script>
+
+<script>
+/* Autoplay: coba putar saat halaman dibuka.
+   Jika diblokir browser, musik otomatis mulai pada sentuhan/klik/tombol pertama. */
+(function(){
+  var audio=document.getElementById('bgm'),
+      btn=document.getElementById('sound'),
+      label=document.getElementById('soundLabel'),
+      TARGET=0.7,        /* volume akhir, 0 sampai 1 */
+      userPaused=false,  /* true jika pengunjung sendiri yang menghentikan */
+      fadeTimer;
+
+  audio.volume=0;
+
+  function fadeTo(v,ms,done){
+    clearInterval(fadeTimer);
+    var start=audio.volume,n=24,i=0;
+    fadeTimer=setInterval(function(){
+      i++;
+      audio.volume=Math.max(0,Math.min(1,start+(v-start)*i/n));
+      if(i>=n){clearInterval(fadeTimer);if(done)done();}
+    },ms/n);
+  }
+
+  function updateUI(){
+    var playing=!audio.paused;
+    btn.setAttribute('aria-pressed',String(playing));
+    label.textContent=playing?'Hening':'Dengarkan';
+  }
+
+  var events=['pointerdown','keydown','touchstart'];
+  function stopWaiting(){
+    events.forEach(function(e){window.removeEventListener(e,onFirstGesture,true);});
+  }
+
+  function play(){
+    var p=audio.play();
+    if(p&&typeof p.then==='function'){
+      p.then(function(){
+        fadeTo(TARGET,2500);
+        updateUI();
+        stopWaiting();
+      }).catch(function(){
+        updateUI(); /* diblokir: tunggu interaksi pertama */
+      });
+    }
+  }
+
+  function onFirstGesture(e){
+    if(userPaused)return;
+    if(e.target&&e.target.closest&&e.target.closest('#sound'))return; /* biar tombol yang mengatur */
+    play();
+  }
+
+  events.forEach(function(e){
+    window.addEventListener(e,onFirstGesture,{capture:true,passive:true});
+  });
+
+  btn.addEventListener('click',function(){
+    if(audio.paused){
+      userPaused=false;
+      play();
+    }else{
+      userPaused=true;
+      fadeTo(0,800,function(){audio.pause();updateUI();});
+    }
+  });
+
+  audio.addEventListener('play',updateUI);
+  audio.addEventListener('pause',updateUI);
+
+  play(); /* percobaan autoplay saat halaman dibuka */
+})();
+</script>
+
+<script>
+/* Adegan perpisahan: mulai saat terlihat di layar, bisa diputar ulang */
+(function(){
+  var sec=document.querySelector('.farewell');
+  if(!sec)return;
+  function start(){sec.classList.remove('play');void sec.offsetWidth;sec.classList.add('play');}
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){if(e.isIntersecting){start();io.disconnect();}});
+    },{threshold:.5});
+    io.observe(sec);
+  }else{start();}
+  sec.querySelector('.replay').addEventListener('click',start);
+})();
+</script>
+
+<script>
+/* Latar bergerak: hujan jatuh dan tetesan meluncur di kaca (dibuat langsung oleh browser) */
+(function(){
+  var c=document.getElementById('rain'),x=c.getContext('2d'),w,h,streaks=[],drops=[],raf;
+  var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var darkMq=matchMedia('(prefers-color-scheme: dark)');
+  function isDark(){var t=document.documentElement.getAttribute('data-theme');return t?t==='dark':darkMq.matches;}
+  function mkStreak(init){return{x:Math.random()*(w+200)-100,y:init?Math.random()*h:-40,l:12+Math.random()*26,v:9+Math.random()*9,a:.12+Math.random()*.25};}
+  function mkDrop(init){var y=init?Math.random()*h:Math.random()*h*.4;return{x:Math.random()*w,y:y,y0:y,r:1.6+Math.random()*3.2,wait:Math.random()*500,sp:0};}
+  function size(){
+    var dpr=Math.min(window.devicePixelRatio||1,2);
+    w=window.innerWidth;h=window.innerHeight;
+    c.width=w*dpr;c.height=h*dpr;x.setTransform(dpr,0,0,dpr,0,0);
+    var i,n=Math.round(w*h/9000),m=Math.max(6,Math.round(w/50));
+    streaks=[];for(i=0;i<n;i++)streaks.push(mkStreak(true));
+    drops=[];for(i=0;i<m;i++)drops.push(mkDrop(true));
+    if(reduce)frame();
+  }
+  function frame(){
+    x.clearRect(0,0,w,h);
+    var d=isDark(),sc=d?'200,216,236':'86,104,130',dc=d?'225,233,246':'255,255,255';
+    x.lineCap='round';x.lineWidth=1;
+    streaks.forEach(function(s){
+      x.strokeStyle='rgba('+sc+','+s.a+')';
+      x.beginPath();x.moveTo(s.x,s.y);x.lineTo(s.x-s.l*.18,s.y+s.l);x.stroke();
+      if(!reduce){s.y+=s.v;s.x-=s.v*.18;if(s.y>h){s.x=Math.random()*(w+200)-100;s.y=-40;}}
+    });
+    drops.forEach(function(p,i){
+      if(!reduce){
+        if(p.wait>0){p.wait--;}
+        else{p.sp=Math.random()<.08?0:.4+Math.random()*1.4;p.y+=p.sp;if(Math.random()<.004)p.wait=40+Math.random()*120;}
+        if(p.y>h+12){drops[i]=mkDrop(false);return;}
+      }
+      if(p.y>p.y0){
+        x.strokeStyle='rgba('+sc+',.14)';x.lineWidth=Math.max(.6,p.r*.35);
+        x.beginPath();x.moveTo(p.x,p.y0);x.lineTo(p.x,p.y);x.stroke();
+      }
+      x.fillStyle='rgba('+dc+',.3)';x.strokeStyle='rgba('+sc+',.28)';x.lineWidth=.8;
+      x.beginPath();x.ellipse(p.x,p.y,p.r*.8,p.r*1.15,0,0,Math.PI*2);x.fill();x.stroke();
+      x.fillStyle='rgba('+dc+',.75)';
+      x.beginPath();x.arc(p.x-p.r*.25,p.y-p.r*.4,Math.max(.5,p.r*.18),0,Math.PI*2);x.fill();
+    });
+    if(!reduce)raf=requestAnimationFrame(frame);
+  }
+  window.addEventListener('resize',size);
+  size();
+  if(!reduce)raf=requestAnimationFrame(frame);
+})();
+</script>
+
+</body>
+</html>
